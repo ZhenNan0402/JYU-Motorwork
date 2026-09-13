@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JYU Motorwork</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #222;
+}
+
+.header {
+    height: 65px;
+    background: #1f2937;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding: 0 25px;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.layout {
+    display: flex;
+    min-height: calc(100vh - 65px);
+}
+
+.sidebar {
+    width: 220px;
+    background: #111827;
+    padding: 20px 10px;
+}
+
+.sidebar button {
+    width: 100%;
+    padding: 14px;
+    margin-bottom: 8px;
+    border: none;
+    background: transparent;
+    color: #d1d5db;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.sidebar button:hover,
+.sidebar button.active {
+    background: #374151;
+    color: white;
+}
+
+.content {
+    flex: 1;
+    padding: 25px;
+}
+
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+h2 {
+    margin-top: 0;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 25px;
+}
+
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+}
+
+.card-title {
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.card-value {
+    font-size: 25px;
+    font-weight: bold;
+    margin-top: 8px;
+}
+
+.panel {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full {
+    grid-column: 1 / -1;
+}
+
+label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+input,
+textarea,
+select {
+    padding: 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    outline: none;
+    border-color: #2563eb;
+}
+
+button.primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+button.primary:hover {
+    background: #1d4ed8;
+}
+
+button.secondary {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.search-row input {
+    flex: 1;
+}
+
+.message {
+    padding: 12px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    display: none;
+}
+
+.message.success {
+    background: #dcfce7;
+    color: #166534;
+    display: block;
+}
+
+.message.error {
+    background: #fee2e2;
+    color: #991b1b;
+    display: block;
+}
+
+.vehicle-info {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.vehicle-info strong {
+    margin-right: 5px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding: 11px;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background: #f9fafb;
+    font-weight: bold;
+}
+
+.money {
+    text-align: right;
+}
+
+.auto-field {
+    background: #f3f4f6;
+    font-weight: bold;
+}
+
+.empty {
+    text-align: center;
+    color: #6b7280;
+    padding: 30px;
+}
+
+@media (max-width: 900px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+    🚗 JYU Motorwork 🚗
+</div>
+
+<div class="layout">
+
+    <div class="sidebar">
+
+        <button class="active" onclick="showPage('dashboard', this)">
+            📊 Dashboard
+        </button>
+
+        <button onclick="showPage('search', this)">
+            🔍 Vehicle Search
+        </button>
+
+        <button onclick="showPage('entry', this)">
+            📝 Data Entry
+        </button>
+
+        <button onclick="showPage('reports', this)">
+            📈 Reports
+        </button>
+
+    </div>
+
+    <div class="content">
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="page active">
+
+            <h2>Dashboard</h2>
+
+            <div class="cards">
+
+                <div class="card">
+                    <div class="card-title">Vehicles</div>
+                    <div class="card-value" id="dashboardVehicles">0</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Repairs</div>
+                    <div class="card-value" id="dashboardRepairs">0</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">This Month Sales</div>
+                    <div class="card-value" id="dashboardSales">RM 0.00</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">This Month Profit</div>
+                    <div class="card-value" id="dashboardProfit">RM 0.00</div>
+                </div>
+
+            </div>
+
+            <div class="panel">
+
+                <h3>Recent Repairs</h3>
+
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Plate</th>
+                            <th>Vehicle</th>
+                            <th>Repair</th>
+                            <th>Total</th>
+                            <th>Profit</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="recentRepairsTable">
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- VEHICLE SEARCH -->
+        <div id="search" class="page">
+
+            <h2>Vehicle Search</h2>
+
+            <div class="panel">
+
+                <div class="search-row">
+
+                    <input
+                        type="text"
+                        id="searchPlate"
+                        placeholder="Enter vehicle plate number"
+                    >
+
+                    <button class="primary" onclick="searchVehicle()">
+                        SEARCH
+                    </button>
+
+                </div>
+
+                <div id="searchMessage" class="message"></div>
+
+                <div id="vehicleResult"></div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DATA ENTRY -->
+        <div id="entry" class="page">
+
+            <h2>Data Entry</h2>
+
+            <div class="panel">
+
+                <div id="entryMessage" class="message"></div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date" id="repairDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vehicle Plate *</label>
+                        <input
+                            type="text"
+                            id="plate"
+                            placeholder="e.g. WXY 1234"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Vehicle Model</label>
+                        <input
+                            type="text"
+                            id="model"
+                            placeholder="e.g. Toyota Vios"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Customer Name</label>
+                        <input
+                            type="text"
+                            id="customer"
+                            placeholder="Customer name"
+                        >
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Repair / Service *</label>
+                        <textarea
+                            id="repair"
+                            placeholder="e.g. Change engine oil and brake pads"
+                        ></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Parts Cost (RM)</label>
+                        <input
+                            type="number"
+                            id="partsCost"
+                            value="0"
+                            min="0"
+                            step="0.01"
+                            oninput="calculateTotal()"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Parts Charged (RM)</label>
+                        <input
+                            type="number"
+                            id="partsCharged"
+                            value="0"
+                            min="0"
+                            step="0.01"
+                            oninput="calculateTotal()"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Labor Charged (RM)</label>
+                        <input
+                            type="number"
+                            id="laborCharged"
+                            value="0"
+                            min="0"
+                            step="0.01"
+                            oninput="calculateTotal()"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Total Charged (RM)</label>
+                        <input
+                            type="number"
+                            id="totalCharged"
+                            class="auto-field"
+                            value="0"
+                            readonly
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label>Gross Profit (RM)</label>
+                        <input
+                            type="number"
+                            id="profit"
+                            class="auto-field"
+                            value="0"
+                            readonly
+                        >
+                    </div>
+
+                    <div class="form-group full">
+                        <label>Remark</label>
+                        <textarea
+                            id="remark"
+                            placeholder="Additional notes..."
+                        ></textarea>
+                    </div>
+
+                </div>
+
+                <br>
+
+                <button class="primary" onclick="saveRepair()">
+                    💾 SAVE & GENERATE INVOICE
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- REPORTS -->
+<div id="reports" class="page">
+
+    <h2>Monthly Reports</h2>
+
+    <div class="panel">
+
+        <div style="display:flex; gap:10px; align-items:end;">
+
+            <div style="flex:1;">
+                <label>Select Month</label>
+
+                <input
+                    type="month"
+                    id="reportMonth"
+                    style="width:100%;"
+                >
+            </div>
+
+            <button
+                class="primary"
+                onclick="generateReport()"
+            >
+                📊 GENERATE REPORT
+            </button>
+
+            <button
+                class="secondary"
+                onclick="exportReportCSV()"
+                title="Download the selected month's report as a CSV file that opens in Excel"
+            >
+                📥 EXPORT EXCEL
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="cards">
+
+        <div class="card">
+            <div class="card-title">Total Sales</div>
+            <div class="card-value" id="reportSales">
+                RM 0.00
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Parts Cost</div>
+            <div class="card-value" id="reportParts">
+                RM 0.00
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Labor</div>
+            <div class="card-value" id="reportLabor">
+                RM 0.00
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Gross Profit</div>
+            <div class="card-value" id="reportProfit">
+                RM 0.00
+            </div>
+        </div>
+
+    </div>
+
+    <div class="panel">
+
+        <h3>Repair Records</h3>
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Plate</th>
+                    <th>Vehicle</th>
+                    <th>Repair</th>
+                    <th>Sales</th>
+                    <th>Parts Cost</th>
+                    <th>Labor</th>
+                    <th>Profit</th>
+                </tr>
+            </thead>
+
+            <tbody id="reportTable">
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+
+<script src="./main.js"></script>
+
+</body>
+</html>
