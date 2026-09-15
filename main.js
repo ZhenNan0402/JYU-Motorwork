@@ -1182,12 +1182,58 @@ async function generateInvoicePDF(repair) {
     const pdfBytes =
         buildSimplePDF(repair);
 
-    const { invoke } = window.__TAURI__.core;
 
-    await invoke("save_invoice_pdf", {
-        filename: filename,
-        data: Array.from(pdfBytes)
-    });
+    /* =========================================
+       TAURI DESKTOP VERSION
+    ========================================= */
+
+    if (
+        window.__TAURI__ &&
+        window.__TAURI__.core &&
+        window.__TAURI__.core.invoke
+    ) {
+
+        const { invoke } = window.__TAURI__.core;
+
+        await invoke("save_invoice_pdf", {
+            filename: filename,
+            data: Array.from(pdfBytes)
+        });
+
+        return filename;
+    }
+
+
+    /* =========================================
+       WEBSITE / BROWSER VERSION
+    ========================================= */
+
+    const blob = new Blob(
+        [pdfBytes],
+        {
+            type: "application/pdf"
+        }
+    );
+
+    const url =
+        URL.createObjectURL(blob);
+
+    const link =
+        document.createElement("a");
+
+    link.href = url;
+
+    link.download = filename;
+
+    document.body.appendChild(link);
+
+    link.click();
+
+    document.body.removeChild(link);
+
+    setTimeout(() => {
+        URL.revokeObjectURL(url);
+    }, 1000);
 
     return filename;
 }
