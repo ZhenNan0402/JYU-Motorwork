@@ -154,173 +154,7 @@ let repairs = JSON.parse(
 ========================================= */
 
 async function loadCloudData() {
-/* =========================================
-   SAVE REPAIR TO SUPABASE
-========================================= */
 
-async function saveRepairToCloud(
-    vehicle,
-    repair
-) {
-
-    /* =============================
-       VEHICLE
-    ============================= */
-
-    const vehicleData = {
-
-        id:
-            vehicle.id,
-
-        plate:
-            vehicle.plate,
-
-        model:
-            vehicle.model || "",
-
-        customer:
-            vehicle.customer || ""
-    };
-
-
-    /*
-       Check whether vehicle already
-       exists in Supabase.
-    */
-
-    const {
-        data: existingVehicle,
-        error: findVehicleError
-    } =
-    await supabaseClient
-        .from("vehicles")
-        .select("id")
-        .eq("plate", vehicle.plate)
-        .maybeSingle();
-
-
-    if (findVehicleError) {
-        throw findVehicleError;
-    }
-
-
-    if (existingVehicle) {
-
-        vehicle.id =
-            Number(existingVehicle.id);
-
-        repair.vehicleId =
-            Number(existingVehicle.id);
-
-
-        const {
-            error: updateVehicleError
-        } =
-        await supabaseClient
-            .from("vehicles")
-            .update({
-
-                model:
-                    vehicle.model || "",
-
-                customer:
-                    vehicle.customer || ""
-
-            })
-            .eq(
-                "id",
-                existingVehicle.id
-            );
-
-
-        if (updateVehicleError) {
-            throw updateVehicleError;
-        }
-
-    }
-    else {
-
-        const {
-            error: insertVehicleError
-        } =
-        await supabaseClient
-            .from("vehicles")
-            .insert(vehicleData);
-
-
-        if (insertVehicleError) {
-            throw insertVehicleError;
-        }
-    }
-
-
-    /* =============================
-       REPAIR
-    ============================= */
-
-    const repairData = {
-
-        id:
-            repair.id,
-
-        invoice_no:
-            repair.invoiceNo,
-
-        vehicle_id:
-            repair.vehicleId,
-
-        date:
-            repair.date,
-
-        plate:
-            repair.plate,
-
-        model:
-            repair.model || "",
-
-        customer:
-            repair.customer || "",
-
-        repair:
-            repair.repair,
-
-        parts_cost:
-            repair.partsCost,
-
-        parts_charged:
-            repair.partsCharged,
-
-        labor:
-            repair.labor,
-
-        total:
-            repair.total,
-
-        profit:
-            repair.profit,
-
-        remark:
-            repair.remark || ""
-    };
-
-
-    const {
-        error: repairError
-    } =
-    await supabaseClient
-        .from("repairs")
-        .insert(repairData);
-
-
-    if (repairError) {
-        throw repairError;
-    }
-
-
-    console.log(
-        "Repair saved to Supabase."
-    );
-}
     try {
 
         /* VEHICLES */
@@ -328,14 +162,12 @@ async function saveRepairToCloud(
         const {
             data: cloudVehicles,
             error: vehicleError
-        } =
-        await supabaseClient
+        } = await supabaseClient
             .from("vehicles")
             .select("*")
             .order("created_at", {
                 ascending: true
             });
-
 
         if (vehicleError) {
             throw vehicleError;
@@ -347,14 +179,12 @@ async function saveRepairToCloud(
         const {
             data: cloudRepairs,
             error: repairError
-        } =
-        await supabaseClient
+        } = await supabaseClient
             .from("repairs")
             .select("*")
             .order("date", {
                 ascending: true
             });
-
 
         if (repairError) {
             throw repairError;
@@ -363,58 +193,30 @@ async function saveRepairToCloud(
 
         /* CONVERT SUPABASE FORMAT */
 
-        vehicles =
-            (cloudVehicles || []).map(v => ({
-                id: Number(v.id),
-                plate: v.plate,
-                model: v.model || "",
-                customer: v.customer || ""
-            }));
+        vehicles = (cloudVehicles || []).map(v => ({
+            id: Number(v.id),
+            plate: v.plate,
+            model: v.model || "",
+            customer: v.customer || ""
+        }));
 
 
-        repairs =
-            (cloudRepairs || []).map(r => ({
-                id: Number(r.id),
-
-                invoiceNo:
-                    r.invoice_no || "",
-
-                vehicleId:
-                    Number(r.vehicle_id),
-
-                date:
-                    r.date,
-
-                plate:
-                    r.plate,
-
-                model:
-                    r.model || "",
-
-                customer:
-                    r.customer || "",
-
-                repair:
-                    r.repair,
-
-                partsCost:
-                    Number(r.parts_cost || 0),
-
-                partsCharged:
-                    Number(r.parts_charged || 0),
-
-                labor:
-                    Number(r.labor || 0),
-
-                total:
-                    Number(r.total || 0),
-
-                profit:
-                    Number(r.profit || 0),
-
-                remark:
-                    r.remark || ""
-            }));
+        repairs = (cloudRepairs || []).map(r => ({
+            id: Number(r.id),
+            invoiceNo: r.invoice_no || "",
+            vehicleId: Number(r.vehicle_id),
+            date: r.date,
+            plate: r.plate,
+            model: r.model || "",
+            customer: r.customer || "",
+            repair: r.repair,
+            partsCost: Number(r.parts_cost || 0),
+            partsCharged: Number(r.parts_charged || 0),
+            labor: Number(r.labor || 0),
+            total: Number(r.total || 0),
+            profit: Number(r.profit || 0),
+            remark: r.remark || ""
+        }));
 
 
         /* UPDATE LOCAL CACHE */
@@ -448,6 +250,119 @@ async function saveRepairToCloud(
     }
 }
 
+
+/* =========================================
+   SAVE REPAIR TO SUPABASE
+========================================= */
+
+async function saveRepairToCloud(vehicle, repair) {
+
+    /* CHECK VEHICLE */
+
+    const {
+        data: existingVehicle,
+        error: findVehicleError
+    } = await supabaseClient
+        .from("vehicles")
+        .select("id")
+        .eq("plate", vehicle.plate)
+        .maybeSingle();
+
+
+    if (findVehicleError) {
+        throw findVehicleError;
+    }
+
+
+    /* EXISTING VEHICLE */
+
+    if (existingVehicle) {
+
+        vehicle.id = Number(existingVehicle.id);
+        repair.vehicleId = Number(existingVehicle.id);
+
+        const {
+            error: updateVehicleError
+        } = await supabaseClient
+            .from("vehicles")
+            .update({
+                model: vehicle.model || "",
+                customer: vehicle.customer || ""
+            })
+            .eq("id", existingVehicle.id);
+
+
+        if (updateVehicleError) {
+            throw updateVehicleError;
+        }
+
+    }
+
+    /* NEW VEHICLE */
+
+    else {
+
+        const {
+            data: insertedVehicle,
+            error: insertVehicleError
+        } = await supabaseClient
+            .from("vehicles")
+            .insert({
+                plate: vehicle.plate,
+                model: vehicle.model || "",
+                customer: vehicle.customer || ""
+            })
+            .select("id")
+            .single();
+
+
+        if (insertVehicleError) {
+            throw insertVehicleError;
+        }
+
+
+        vehicle.id = Number(insertedVehicle.id);
+        repair.vehicleId = Number(insertedVehicle.id);
+    }
+
+
+    /* SAVE REPAIR */
+
+    const {
+        data: insertedRepair,
+        error: repairError
+    } = await supabaseClient
+        .from("repairs")
+        .insert({
+            invoice_no: repair.invoiceNo,
+            vehicle_id: repair.vehicleId,
+            date: repair.date,
+            plate: repair.plate,
+            model: repair.model || "",
+            customer: repair.customer || "",
+            repair: repair.repair,
+            parts_cost: repair.partsCost,
+            parts_charged: repair.partsCharged,
+            labor: repair.labor,
+            total: repair.total,
+            profit: repair.profit,
+            remark: repair.remark || ""
+        })
+        .select("id")
+        .single();
+
+
+    if (repairError) {
+        throw repairError;
+    }
+
+
+    repair.id = Number(insertedRepair.id);
+
+    console.log(
+        "Repair saved to Supabase successfully."
+    );
+}
 /* =========================================
    PAGE NAVIGATION
 ========================================= */
