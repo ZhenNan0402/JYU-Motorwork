@@ -1,7 +1,147 @@
 /* =========================================
    DATA STORAGE
 ========================================= */
+/* =========================================
+   SUPABASE
+========================================= */
 
+const SUPABASE_URL =
+    "https://bceahbwtgtixyuyjealv.supabase.co";
+
+const SUPABASE_KEY =
+    "sb_publishable_yXMXdkVz4GNjPPeohKO2KQ_4jkli52T";
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+    );
+
+
+/* =========================================
+   LOGIN
+========================================= */
+
+async function loginUser() {
+
+    const email =
+        document.getElementById("loginEmail")
+        .value
+        .trim();
+
+    const password =
+        document.getElementById("loginPassword")
+        .value;
+
+    const errorBox =
+        document.getElementById("loginError");
+
+    errorBox.style.display = "none";
+
+
+    if (!email || !password) {
+
+        errorBox.textContent =
+            "Please enter email and password.";
+
+        errorBox.style.display = "block";
+
+        return;
+    }
+
+
+    const { error } =
+        await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+
+
+    if (error) {
+
+        console.error(error);
+
+        errorBox.textContent =
+            "Login failed. Please check email and password.";
+
+        errorBox.style.display = "block";
+
+        return;
+    }
+
+
+    await startGarageApp();
+}
+
+
+/* =========================================
+   LOGOUT
+========================================= */
+
+async function logoutUser() {
+
+    await supabaseClient.auth.signOut();
+
+    document.getElementById("mainApp")
+        .style.display = "none";
+
+    document.getElementById("loginScreen")
+        .style.display = "flex";
+
+    document.getElementById("loginPassword")
+        .value = "";
+}
+
+
+/* =========================================
+   CHECK LOGIN
+========================================= */
+
+async function checkLogin() {
+
+    const {
+        data: { session }
+    } = await supabaseClient.auth.getSession();
+
+
+    if (session) {
+
+        await startGarageApp();
+
+    }
+    else {
+
+        document.getElementById("loginScreen")
+            .style.display = "flex";
+
+        document.getElementById("mainApp")
+            .style.display = "none";
+    }
+}
+
+
+/* =========================================
+   START GARAGE
+========================================= */
+
+async function startGarageApp() {
+
+    document.getElementById("loginScreen")
+        .style.display = "none";
+
+    document.getElementById("mainApp")
+        .style.display = "block";
+
+
+    await loadCloudData();
+
+
+    setDefaultDate();
+
+    updateDashboard();
+
+    updateReport();
+}
 let vehicles = JSON.parse(
     localStorage.getItem("garageVehicles") || "[]"
 );
@@ -9,7 +149,304 @@ let vehicles = JSON.parse(
 let repairs = JSON.parse(
     localStorage.getItem("garageRepairs") || "[]"
 );
+/* =========================================
+   LOAD DATA FROM SUPABASE
+========================================= */
 
+async function loadCloudData() {
+/* =========================================
+   SAVE REPAIR TO SUPABASE
+========================================= */
+
+async function saveRepairToCloud(
+    vehicle,
+    repair
+) {
+
+    /* =============================
+       VEHICLE
+    ============================= */
+
+    const vehicleData = {
+
+        id:
+            vehicle.id,
+
+        plate:
+            vehicle.plate,
+
+        model:
+            vehicle.model || "",
+
+        customer:
+            vehicle.customer || ""
+    };
+
+
+    /*
+       Check whether vehicle already
+       exists in Supabase.
+    */
+
+    const {
+        data: existingVehicle,
+        error: findVehicleError
+    } =
+    await supabaseClient
+        .from("vehicles")
+        .select("id")
+        .eq("plate", vehicle.plate)
+        .maybeSingle();
+
+
+    if (findVehicleError) {
+        throw findVehicleError;
+    }
+
+
+    if (existingVehicle) {
+
+        vehicle.id =
+            Number(existingVehicle.id);
+
+        repair.vehicleId =
+            Number(existingVehicle.id);
+
+
+        const {
+            error: updateVehicleError
+        } =
+        await supabaseClient
+            .from("vehicles")
+            .update({
+
+                model:
+                    vehicle.model || "",
+
+                customer:
+                    vehicle.customer || ""
+
+            })
+            .eq(
+                "id",
+                existingVehicle.id
+            );
+
+
+        if (updateVehicleError) {
+            throw updateVehicleError;
+        }
+
+    }
+    else {
+
+        const {
+            error: insertVehicleError
+        } =
+        await supabaseClient
+            .from("vehicles")
+            .insert(vehicleData);
+
+
+        if (insertVehicleError) {
+            throw insertVehicleError;
+        }
+    }
+
+
+    /* =============================
+       REPAIR
+    ============================= */
+
+    const repairData = {
+
+        id:
+            repair.id,
+
+        invoice_no:
+            repair.invoiceNo,
+
+        vehicle_id:
+            repair.vehicleId,
+
+        date:
+            repair.date,
+
+        plate:
+            repair.plate,
+
+        model:
+            repair.model || "",
+
+        customer:
+            repair.customer || "",
+
+        repair:
+            repair.repair,
+
+        parts_cost:
+            repair.partsCost,
+
+        parts_charged:
+            repair.partsCharged,
+
+        labor:
+            repair.labor,
+
+        total:
+            repair.total,
+
+        profit:
+            repair.profit,
+
+        remark:
+            repair.remark || ""
+    };
+
+
+    const {
+        error: repairError
+    } =
+    await supabaseClient
+        .from("repairs")
+        .insert(repairData);
+
+
+    if (repairError) {
+        throw repairError;
+    }
+
+
+    console.log(
+        "Repair saved to Supabase."
+    );
+}
+    try {
+
+        /* VEHICLES */
+
+        const {
+            data: cloudVehicles,
+            error: vehicleError
+        } =
+        await supabaseClient
+            .from("vehicles")
+            .select("*")
+            .order("created_at", {
+                ascending: true
+            });
+
+
+        if (vehicleError) {
+            throw vehicleError;
+        }
+
+
+        /* REPAIRS */
+
+        const {
+            data: cloudRepairs,
+            error: repairError
+        } =
+        await supabaseClient
+            .from("repairs")
+            .select("*")
+            .order("date", {
+                ascending: true
+            });
+
+
+        if (repairError) {
+            throw repairError;
+        }
+
+
+        /* CONVERT SUPABASE FORMAT */
+
+        vehicles =
+            (cloudVehicles || []).map(v => ({
+                id: Number(v.id),
+                plate: v.plate,
+                model: v.model || "",
+                customer: v.customer || ""
+            }));
+
+
+        repairs =
+            (cloudRepairs || []).map(r => ({
+                id: Number(r.id),
+
+                invoiceNo:
+                    r.invoice_no || "",
+
+                vehicleId:
+                    Number(r.vehicle_id),
+
+                date:
+                    r.date,
+
+                plate:
+                    r.plate,
+
+                model:
+                    r.model || "",
+
+                customer:
+                    r.customer || "",
+
+                repair:
+                    r.repair,
+
+                partsCost:
+                    Number(r.parts_cost || 0),
+
+                partsCharged:
+                    Number(r.parts_charged || 0),
+
+                labor:
+                    Number(r.labor || 0),
+
+                total:
+                    Number(r.total || 0),
+
+                profit:
+                    Number(r.profit || 0),
+
+                remark:
+                    r.remark || ""
+            }));
+
+
+        /* UPDATE LOCAL CACHE */
+
+        localStorage.setItem(
+            "garageVehicles",
+            JSON.stringify(vehicles)
+        );
+
+        localStorage.setItem(
+            "garageRepairs",
+            JSON.stringify(repairs)
+        );
+
+
+        console.log(
+            "Supabase data loaded successfully."
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Supabase loading failed:",
+            error
+        );
+
+        console.log(
+            "Using local cached data."
+        );
+    }
+}
 
 /* =========================================
    PAGE NAVIGATION
@@ -246,7 +683,39 @@ async function saveRepair() {
     repairs.push(newRepair);
 
 
-    /* Save */
+/* =========================================
+   SAVE LOCAL COPY
+========================================= */
+
+localStorage.setItem(
+    "garageVehicles",
+    JSON.stringify(vehicles)
+);
+
+localStorage.setItem(
+    "garageRepairs",
+    JSON.stringify(repairs)
+);
+
+
+/* =========================================
+   SAVE CLOUD COPY
+========================================= */
+
+let cloudMessage = "";
+
+try {
+
+    await saveRepairToCloud(
+        vehicle,
+        newRepair
+    );
+
+
+    /*
+       Save again because Supabase may
+       have supplied an existing vehicle ID.
+    */
 
     localStorage.setItem(
         "garageVehicles",
@@ -258,6 +727,21 @@ async function saveRepair() {
         JSON.stringify(repairs)
     );
 
+
+    cloudMessage =
+        " ☁ Cloud backup successful.";
+
+}
+catch (error) {
+
+    console.error(
+        "Supabase backup error:",
+        error
+    );
+
+    cloudMessage =
+        " ⚠ Saved locally, but cloud backup failed.";
+}
 
     /* Generate PDF invoice on Desktop */
     let invoiceMessage = "";
@@ -274,8 +758,9 @@ async function saveRepair() {
     /* Success */
     showMessage(
         "entryMessage",
-        "✓ Repair saved successfully!" + invoiceMessage,
-        "success"
+        "✓ Repair saved successfully!" +
+cloudMessage +
+invoiceMessage,
     );
 
 
@@ -1275,11 +1760,7 @@ function escapeHTML(value) {
    INITIALIZE
 ========================================= */
 
-setDefaultDate();
-
-updateDashboard();
-
-updateReport();
+checkLogin();
 /* =========================================
    EXPOSE FUNCTIONS TO HTML BUTTONS
 ========================================= */
@@ -1290,3 +1771,5 @@ window.saveRepair = saveRepair;
 window.searchVehicle = searchVehicle;
 window.generateReport = generateReport;
 window.exportReportCSV = exportReportCSV;
+window.loginUser = loginUser;
+window.logoutUser = logoutUser;
