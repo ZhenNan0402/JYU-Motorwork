@@ -1348,12 +1348,12 @@ function buildSimplePDF(repair) {
    GARAGE HEADER
 ================================ */
 
-addText("JYU MOTORWORK", 50, 790, 22, true);
+addText("JYU&CRAFT MOTORWORK", 50, 790, 22, true);
 
-addText("Garage address goes here", 50, 770, 9);
-addText("Second address line if needed", 50, 756, 9);
-addText("SSM No: XXXXXXXX", 50, 742, 9);
-addText("Phone No: 0182264102", 50, 728, 9);
+addText("18, JALAN BUKIT MEWAH 8", 50, 770, 9);
+addText("202603230251", 50, 756, 9);
+addText("KT0620371-P", 50, 742, 9);
+addText("Phone No: 0173102339", 50, 728, 9);
 
 addText("INVOICE", 450, 790, 18, true);
 
@@ -1490,7 +1490,7 @@ addText(
 );
 
 addText(
-    "JYU Motorwork",
+    "JYU&Craft Motorwork",
     450,
     92,
     10,
