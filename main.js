@@ -1483,7 +1483,7 @@ if (repair.remark) {
 addLine(50, 115, 545, 115, 0.7);
 
 addText(
-    "Thank you for your business.",
+    "Thank you for your support.",
     50,
     92,
     10
