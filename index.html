@@ -13,18 +13,8 @@
 .login-screen {
     position: fixed;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 
-    background:
-        linear-gradient(
-            rgba(0,0,0,0.35),
-            rgba(0,0,0,0.70)
-        ),
-        url("./BMW.gif");
-
-    z-index: 9999;
+    background-image: url("./BMW.gif");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -35,10 +25,7 @@
 
     overflow: hidden;
     z-index: 9999;
-
-    animation: backgroundZoom 12s ease-in-out infinite alternate;
 }
-
 
 /* Slow cinematic camera movement */
 @keyframes backgroundZoom {
@@ -53,20 +40,7 @@
 }
 
 
-/* Dark layer before headlights appear */
-.login-screen::before {
 
-    content: "";
-
-    position: absolute;
-    inset: 0;
-
-    background: rgba(0,0,0,0.75);
-
-    animation: lightsOn 2.5s ease forwards;
-
-    pointer-events: none;
-}
 
 
 /* Simulates the darkness disappearing
