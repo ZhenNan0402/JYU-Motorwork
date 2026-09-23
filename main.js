@@ -4,33 +4,12 @@
 /* =========================================
    SUPABASE
 ========================================= */
-const repairRows = repairRows.innerHTML = "";
-addRepairRow();
-const addRepairRowBtn = document.getElementById("addRepairRow");
-addRepairRowBtn.addEventListener("click", () => {
-    addRepairRow();
-});
+let repairRows;
+let addRepairRowBtn;
 
-addRepairRow();
-function formatRepairItems(repair) {
-
-    const items = parseRepairItems(repair);
-
-    return items
-        .map((item, index) => {
-
-            const description =
-                item.description || "";
-
-            const quantity =
-                Number(item.quantity) || 1;
-
-            return `${index + 1}. ${description} x${quantity}`;
-
-        })
-        .join(", ");
-}
 function addRepairRow(description = "", quantity = 1) {
+
+    if (!repairRows) return;
 
     const row = document.createElement("div");
     row.className = "repair-row";
@@ -42,7 +21,6 @@ function addRepairRow(description = "", quantity = 1) {
             type="text"
             class="repair-description"
             placeholder="Enter description"
-            value="${description}"
         >
 
         <input
@@ -60,15 +38,17 @@ function addRepairRow(description = "", quantity = 1) {
         </button>
     `;
 
+    row.querySelector(".repair-description").value =
+        description;
+
     repairRows.appendChild(row);
 
-    row
-        .querySelector(".remove-repair-row")
+    row.querySelector(".remove-repair-row")
         .addEventListener("click", () => {
 
             row.remove();
-
             updateRepairNumbers();
+
         });
 
     updateRepairNumbers();
@@ -89,13 +69,37 @@ function updateRepairNumbers() {
 }
 
 
-addRepairRowBtn.addEventListener("click", () => {
+/* Initialize Repair / Service rows */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    repairRows =
+        document.getElementById("repairRows");
+
+    addRepairRowBtn =
+        document.getElementById("addRepairRow");
+
+
+    if (!repairRows || !addRepairRowBtn) {
+
+        console.error(
+            "Repair row HTML elements not found."
+        );
+
+        return;
+    }
+
+
+    addRepairRowBtn.addEventListener("click", () => {
+
+        addRepairRow();
+
+    });
+
 
     addRepairRow();
 
 });
-
-
 /* Start with one empty row */
 
 addRepairRow();
