@@ -1593,12 +1593,12 @@ addText(
 
 addText(
     `Vehicle Model: ${repair.model || "-"}`,
-    300,
-    635,
+    50,
+    612,
     11
 );
 
-addLine(50, 613, 545, 613, 0.8);
+addLine(50, 590, 545, 590, 0.8);
 
 
 /* ================================
@@ -1609,7 +1609,7 @@ addLine(50, 613, 545, 613, 0.8);
    REPAIR / SERVICE TABLE
 ================================ */
 
-let y = 590;
+let y = 565;
 
 const tableLeft = 50;
 const tableRight = 545;
@@ -1750,7 +1750,7 @@ const tableBottom = y;
 
 addLine(
     tableLeft,
-    590,
+    565,
     tableLeft,
     tableBottom,
     0.8
@@ -1758,53 +1758,80 @@ addLine(
 
 addLine(
     tableRight,
-    590,
+    565,
     tableRight,
     tableBottom,
     0.8
 );
 
 
-/* Space before charges */
+/* ================================
+   FIXED TOTALS - BOTTOM RIGHT
+================================ */
 
-y -= 30;
+const totalsLabelX = 330;
+const totalsAmountX = 455;
 
-addText("Parts Charged", 300, y, 11);
+/* Parts Charged */
+addText(
+    "Parts Charged",
+    totalsLabelX,
+    205,
+    11
+);
+
 addText(
     `RM ${Number(repair.partsCharged || 0).toFixed(2)}`,
-    455,
-    y,
+    totalsAmountX,
+    205,
     11,
     true
 );
 
-y -= 24;
 
-addText("Labor Charged", 300, y, 11);
+/* Labor Charged */
+addText(
+    "Labor Charged",
+    totalsLabelX,
+    180,
+    11
+);
+
 addText(
     `RM ${Number(repair.labor || 0).toFixed(2)}`,
-    455,
-    y,
+    totalsAmountX,
+    180,
     11,
     true
 );
 
-y -= 18;
 
-addLine(300, y, 545, y, 0.8);
+/* Line above total */
+addLine(
+    330,
+    162,
+    545,
+    162,
+    0.8
+);
 
-y -= 32;
 
-addText("TOTAL", 300, y, 14, true);
-
+/* TOTAL */
 addText(
-    `RM ${Number(repair.total || 0).toFixed(2)}`,
-    445,
-    y,
+    "TOTAL",
+    totalsLabelX,
+    138,
     14,
     true
 );
 
+addText(
+    `RM ${Number(repair.total || 0).toFixed(2)}`,
+    445,
+    138,
+    14,
+    true
+);
 if (repair.remark) {
     y -= 55;
 
