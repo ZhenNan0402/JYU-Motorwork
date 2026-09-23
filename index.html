@@ -754,13 +754,26 @@ th {
                         >
                     </div>
 
-                    <div class="form-group full">
-                        <label>Repair / Service *</label>
-                        <textarea
-                            id="repair"
-                            placeholder="e.g. Change engine oil and brake pads"
-                        ></textarea>
-                    </div>
+                    <div class="form-group">
+    <label>Repair / Service</label>
+
+    <div class="repair-table">
+
+        <div class="repair-header">
+            <span>No.</span>
+            <span>Description</span>
+            <span>Quantity</span>
+            <span></span>
+        </div>
+
+        <div id="repairRows"></div>
+
+        <button type="button" id="addRepairRow">
+            + Add Row
+        </button>
+
+    </div>
+</div>
 
                     <div class="form-group">
                         <label>Parts Cost (RM)</label>
