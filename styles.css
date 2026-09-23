@@ -122,3 +122,34 @@ button {
   }
   
 }
+.repair-header,
+.repair-row {
+    display: grid;
+    grid-template-columns: 50px 1fr 100px 45px;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.repair-header {
+    font-weight: bold;
+}
+
+.repair-description,
+.repair-quantity {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+}
+
+.repair-quantity {
+    text-align: center;
+}
+
+.remove-repair-row {
+    cursor: pointer;
+}
+
+#addRepairRow {
+    margin-top: 10px;
+}
