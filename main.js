@@ -248,6 +248,10 @@ let repairs = JSON.parse(
 /* =========================================
    LOAD DATA FROM SUPABASE
 ========================================= */
+/* =========================================
+   REPAIR ITEM HELPERS
+========================================= */
+
 function parseRepairItems(value) {
 
     if (Array.isArray(value)) {
@@ -298,35 +302,14 @@ function formatRepairItems(value) {
         })
         .join(", ");
 }
+
+
+/* =========================================
+   LOAD DATA FROM SUPABASE
+========================================= */
+
 async function loadCloudData() {
-    if (Array.isArray(value)) {
-        return value;
-    }
 
-    if (!value) {
-        return [];
-    }
-
-    try {
-
-        const parsed = JSON.parse(value);
-
-        if (Array.isArray(parsed)) {
-            return parsed;
-        }
-
-    }
-    catch (error) {
-        // Old repair records were normal text.
-    }
-
-    return [
-        {
-            description: String(value),
-            quantity: 1
-        }
-    ];
-}
     try {
 
         /* VEHICLES */
@@ -403,7 +386,6 @@ async function loadCloudData() {
             JSON.stringify(repairs)
         );
 
-
         console.log(
             "Supabase data loaded successfully."
         );
@@ -421,8 +403,6 @@ async function loadCloudData() {
         );
     }
 }
-
-
 /* =========================================
    SAVE REPAIR TO SUPABASE
 ========================================= */
