@@ -4,7 +4,78 @@
 /* =========================================
    SUPABASE
 ========================================= */
+const repairRows = document.getElementById("repairRows");
+const addRepairRowBtn = document.getElementById("addRepairRow");
 
+function addRepairRow(description = "", quantity = 1) {
+
+    const row = document.createElement("div");
+    row.className = "repair-row";
+
+    row.innerHTML = `
+        <span class="repair-number"></span>
+
+        <input
+            type="text"
+            class="repair-description"
+            placeholder="Enter description"
+            value="${description}"
+        >
+
+        <input
+            type="number"
+            class="repair-quantity"
+            value="${quantity}"
+            min="1"
+        >
+
+        <button
+            type="button"
+            class="remove-repair-row"
+        >
+            ×
+        </button>
+    `;
+
+    repairRows.appendChild(row);
+
+    row
+        .querySelector(".remove-repair-row")
+        .addEventListener("click", () => {
+
+            row.remove();
+
+            updateRepairNumbers();
+        });
+
+    updateRepairNumbers();
+}
+
+
+function updateRepairNumbers() {
+
+    const rows =
+        document.querySelectorAll(".repair-row");
+
+    rows.forEach((row, index) => {
+
+        row.querySelector(".repair-number").textContent =
+            index + 1;
+
+    });
+}
+
+
+addRepairRowBtn.addEventListener("click", () => {
+
+    addRepairRow();
+
+});
+
+
+/* Start with one empty row */
+
+addRepairRow();
 const SUPABASE_URL =
     "https://bceahbwtgtixyuyjealv.supabase.co";
 
