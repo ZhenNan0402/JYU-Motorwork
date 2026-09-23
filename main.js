@@ -374,35 +374,7 @@ async function loadCloudData() {
         }));
 
 
-        /* UPDATE LOCAL CACHE */
-
-        localStorage.setItem(
-            "garageVehicles",
-            JSON.stringify(vehicles)
-        );
-
-        localStorage.setItem(
-            "garageRepairs",
-            JSON.stringify(repairs)
-        );
-
-        console.log(
-            "Supabase data loaded successfully."
-        );
-
-    }
-    catch (error) {
-
-        console.error(
-            "Supabase loading failed:",
-            error
-        );
-
-        console.log(
-            "Using local cached data."
-        );
-    }
-}
+       
 /* =========================================
    SAVE REPAIR TO SUPABASE
 ========================================= */
