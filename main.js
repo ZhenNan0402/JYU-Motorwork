@@ -238,13 +238,8 @@ async function startGarageApp() {
 
     updateReport();
 }
-let vehicles = JSON.parse(
-    localStorage.getItem("garageVehicles") || "[]"
-);
-
-let repairs = JSON.parse(
-    localStorage.getItem("garageRepairs") || "[]"
-);
+let vehicles = [];
+let repairs = [];
 /* =========================================
    LOAD DATA FROM SUPABASE
 ========================================= */
@@ -373,7 +368,23 @@ async function loadCloudData() {
             remark: r.remark || ""
         }));
 
+console.log(
+            "Supabase data loaded successfully."
+        );
 
+    }
+    catch (error) {
+
+        console.error(
+            "Supabase loading failed:",
+            error
+        );
+
+        console.log(
+            "Using local cached data."
+        );
+    }
+}
        
 /* =========================================
    SAVE REPAIR TO SUPABASE
@@ -743,20 +754,6 @@ document.querySelectorAll(".repair-row").forEach(row => {
     repairs.push(newRepair);
 
 
-/* =========================================
-   SAVE LOCAL COPY
-========================================= */
-
-localStorage.setItem(
-    "garageVehicles",
-    JSON.stringify(vehicles)
-);
-
-localStorage.setItem(
-    "garageRepairs",
-    JSON.stringify(repairs)
-);
-
 
 /* =========================================
    SAVE CLOUD COPY
@@ -770,24 +767,6 @@ try {
         vehicle,
         newRepair
     );
-
-
-    /*
-       Save again because Supabase may
-       have supplied an existing vehicle ID.
-    */
-
-    localStorage.setItem(
-        "garageVehicles",
-        JSON.stringify(vehicles)
-    );
-
-    localStorage.setItem(
-        "garageRepairs",
-        JSON.stringify(repairs)
-    );
-
-
     cloudMessage =
         " ☁ Cloud backup successful.";
 
@@ -800,7 +779,7 @@ catch (error) {
     );
 
     cloudMessage =
-        " ⚠ Saved locally, but cloud backup failed.";
+        " ⚠ Cloud save failed.";
 }
 
     /* Generate PDF invoice on Desktop */
