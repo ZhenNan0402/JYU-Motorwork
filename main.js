@@ -100,9 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
     addRepairRow();
 
 });
-/* Start with one empty row */
 
-addRepairRow();
 const SUPABASE_URL =
     "https://bceahbwtgtixyuyjealv.supabase.co";
 
@@ -250,10 +248,57 @@ let repairs = JSON.parse(
 /* =========================================
    LOAD DATA FROM SUPABASE
 ========================================= */
-
-async function loadCloudData() {
 function parseRepairItems(value) {
 
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (!value) {
+        return [];
+    }
+
+    try {
+
+        const parsed = JSON.parse(value);
+
+        if (Array.isArray(parsed)) {
+            return parsed;
+        }
+
+    }
+    catch (error) {
+        // Old records may be normal text.
+    }
+
+    return [
+        {
+            description: String(value),
+            quantity: 1
+        }
+    ];
+}
+
+
+function formatRepairItems(value) {
+
+    const items = parseRepairItems(value);
+
+    return items
+        .map((item, index) => {
+
+            const description =
+                item.description || "";
+
+            const quantity =
+                Number(item.quantity) || 1;
+
+            return `${index + 1}. ${description} x${quantity}`;
+
+        })
+        .join(", ");
+}
+async function loadCloudData() {
     if (Array.isArray(value)) {
         return value;
     }
@@ -829,7 +874,8 @@ invoiceMessage,
 
     /* Clear repair fields */
 
-    document.getElementById("repair").value = "";
+    repairRows.innerHTML = "";
+addRepairRow();
 
     document.getElementById("partsCost").value = "0";
 
