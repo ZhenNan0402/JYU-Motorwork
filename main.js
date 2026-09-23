@@ -1547,7 +1547,7 @@ addText(
 
 addText(
     `Date: ${repair.date || ""}`,
-    390,
+    435,
     685,
     10
 );
