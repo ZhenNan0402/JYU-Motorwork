@@ -4,9 +4,32 @@
 /* =========================================
    SUPABASE
 ========================================= */
-const repairRows = document.getElementById("repairRows");
+const repairRows = repairRows.innerHTML = "";
+addRepairRow();
 const addRepairRowBtn = document.getElementById("addRepairRow");
+addRepairRowBtn.addEventListener("click", () => {
+    addRepairRow();
+});
 
+addRepairRow();
+function formatRepairItems(repair) {
+
+    const items = parseRepairItems(repair);
+
+    return items
+        .map((item, index) => {
+
+            const description =
+                item.description || "";
+
+            const quantity =
+                Number(item.quantity) || 1;
+
+            return `${index + 1}. ${description} x${quantity}`;
+
+        })
+        .join(", ");
+}
 function addRepairRow(description = "", quantity = 1) {
 
     const row = document.createElement("div");
@@ -225,7 +248,36 @@ let repairs = JSON.parse(
 ========================================= */
 
 async function loadCloudData() {
+function parseRepairItems(value) {
 
+    if (Array.isArray(value)) {
+        return value;
+    }
+
+    if (!value) {
+        return [];
+    }
+
+    try {
+
+        const parsed = JSON.parse(value);
+
+        if (Array.isArray(parsed)) {
+            return parsed;
+        }
+
+    }
+    catch (error) {
+        // Old repair records were normal text.
+    }
+
+    return [
+        {
+            description: String(value),
+            quantity: 1
+        }
+    ];
+}
     try {
 
         /* VEHICLES */
@@ -280,7 +332,7 @@ async function loadCloudData() {
             plate: r.plate,
             model: r.model || "",
             customer: r.customer || "",
-            repair: r.repair,
+            repair: parseRepairItems(r.repair),
             partsCost: Number(r.parts_cost || 0),
             partsCharged: Number(r.parts_charged || 0),
             labor: Number(r.labor || 0),
@@ -411,7 +463,7 @@ async function saveRepairToCloud(vehicle, repair) {
             plate: repair.plate,
             model: repair.model || "",
             customer: repair.customer || "",
-            repair: repair.repair,
+            repair: JSON.stringify(repair.repair),
             parts_cost: repair.partsCost,
             parts_charged: repair.partsCharged,
             labor: repair.labor,
@@ -527,8 +579,30 @@ async function saveRepair() {
     const customer =
         document.getElementById("customer").value.trim();
 
-    const repair =
-        document.getElementById("repair").value.trim();
+    const repairItems = [];
+
+document.querySelectorAll(".repair-row").forEach(row => {
+
+    const description =
+        row.querySelector(".repair-description")
+            .value
+            .trim();
+
+    const quantity =
+        parseInt(
+            row.querySelector(".repair-quantity").value
+        ) || 1;
+
+    if (description) {
+
+        repairItems.push({
+            description: description,
+            quantity: quantity
+        });
+
+    }
+
+});
 
     const partsCost =
         parseFloat(document.getElementById("partsCost").value) || 0;
@@ -573,17 +647,16 @@ async function saveRepair() {
         return;
     }
 
-    if (!repair) {
+   if (repairItems.length === 0) {
 
-        showMessage(
-            "entryMessage",
-            "Please enter the repair / service.",
-            "error"
-        );
+    showMessage(
+        "entryMessage",
+        "Please enter at least one repair / service.",
+        "error"
+    );
 
-        return;
-    }
-
+    return;
+}
 
     /* Find existing vehicle */
 
@@ -649,7 +722,7 @@ async function saveRepair() {
 
         customer: vehicle.customer,
 
-        repair: repair,
+        repair: repairItems,
 
         partsCost: partsCost,
 
@@ -893,7 +966,7 @@ function searchVehicle() {
                     <td>${r.date}</td>
 
                     <td>
-                        ${escapeHTML(r.repair)}
+                        ${escapeHTML(formatRepairItems(r.repair))}
                     </td>
 
                     <td class="money">
@@ -1047,7 +1120,7 @@ function updateRecentRepairs() {
 
                 <td>${escapeHTML(r.model || "-")}</td>
 
-                <td>${escapeHTML(r.repair)}</td>
+                <td>${escapeHTML(formatRepairItems(r.repair))}</td>
 
                 <td class="money">
                     RM ${r.total.toFixed(2)}
@@ -1191,7 +1264,7 @@ function updateReport() {
 
                 <td>${escapeHTML(r.model || "-")}</td>
 
-                <td>${escapeHTML(r.repair)}</td>
+                <td>${escapeHTML(formatRepairItems(r.repair))}</td>
 
                 <td class="money">
                     RM ${r.total.toFixed(2)}
@@ -1296,7 +1369,7 @@ function exportReportCSV() {
                 r.date,
                 r.plate,
                 r.model || "",
-                r.repair,
+                formatRepairItems(r.repair),
                 Number(r.partsCharged || 0).toFixed(2),
                 Number(r.partsCost || 0).toFixed(2),
                 Number(r.labor || 0).toFixed(2),
