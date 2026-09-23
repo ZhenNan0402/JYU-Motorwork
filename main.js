@@ -1411,20 +1411,169 @@ addLine(50, 613, 545, 613, 0.8);
    REPAIR / SERVICE
 ================================ */
 
-addText("Repair / Service", 50, 588, 11, true);
+/* ================================
+   REPAIR / SERVICE TABLE
+================================ */
 
-let y = 568;
+let y = 590;
 
-wrapInvoiceText(repair.repair, 70).forEach(line => {
-    addText(line, 50, y, 10);
-    y -= 16;
+const tableLeft = 50;
+const tableRight = 545;
+
+const noX = 50;
+const serviceX = 90;
+const qtyX = 465;
+
+const headerHeight = 26;
+const rowHeight = 25;
+
+/* Top line */
+addLine(tableLeft, y, tableRight, y, 0.8);
+
+/* Header */
+addText("No.", 60, y - 18, 10, true);
+addText("Repair / Service", 100, y - 18, 10, true);
+addText("Quantity", 475, y - 18, 10, true);
+
+y -= headerHeight;
+
+/* Header bottom line */
+addLine(tableLeft, y, tableRight, y, 0.8);
+
+/* Vertical header lines */
+addLine(88, y + headerHeight, 88, y, 0.8);
+addLine(455, y + headerHeight, 455, y, 0.8);
+
+
+/* ================================
+   SERVICE ROWS
+================================ */
+
+/*
+   For now this supports repair being either:
+
+   1. An array of service items
+   OR
+   2. Your existing repair text
+*/
+
+let serviceItems = [];
+
+if (Array.isArray(repair.repair)) {
+
+    serviceItems = repair.repair;
+
+} else if (repair.repair) {
+
+    /*
+       If your existing repair field contains
+       multiple lines, each line becomes one row.
+    */
+
+    serviceItems = String(repair.repair)
+        .split("\n")
+        .filter(item => item.trim() !== "")
+        .map(item => ({
+            description: item.trim(),
+            quantity: 1
+        }));
+}
+
+
+/* Draw rows */
+
+serviceItems.forEach((item, index) => {
+
+    const description =
+        typeof item === "string"
+            ? item
+            : item.description || item.name || "";
+
+    const quantity =
+        typeof item === "object"
+            ? item.quantity || 1
+            : 1;
+
+    const rowTop = y;
+
+    /* Row number */
+    addText(
+        String(index + 1),
+        65,
+        y - 17,
+        10
+    );
+
+    /* Service description */
+    addText(
+        description,
+        100,
+        y - 17,
+        10
+    );
+
+    /* Quantity */
+    addText(
+        String(quantity),
+        490,
+        y - 17,
+        10
+    );
+
+    y -= rowHeight;
+
+    /* Bottom line */
+    addLine(
+        tableLeft,
+        y,
+        tableRight,
+        y,
+        0.5
+    );
+
+    /* Vertical lines */
+    addLine(
+        88,
+        rowTop,
+        88,
+        y,
+        0.5
+    );
+
+    addLine(
+        455,
+        rowTop,
+        455,
+        y,
+        0.5
+    );
 });
 
-y -= 8;
 
-addLine(50, y, 545, y, 0.8);
+/* Outer left/right borders */
 
-y -= 28;
+const tableBottom = y;
+
+addLine(
+    tableLeft,
+    590,
+    tableLeft,
+    tableBottom,
+    0.8
+);
+
+addLine(
+    tableRight,
+    590,
+    tableRight,
+    tableBottom,
+    0.8
+);
+
+
+/* Space before charges */
+
+y -= 30;
 
 addText("Parts Charged", 300, y, 11);
 addText(
