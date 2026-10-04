@@ -917,6 +917,7 @@ function searchVehicle() {
                     <th>Labor</th>
                     <th>Total</th>
                     <th>Profit</th>
+					<th>Invoice</th>
                 </tr>
 
             </thead>
@@ -929,7 +930,7 @@ function searchVehicle() {
 
         html += `
             <tr>
-                <td colspan="7" class="empty">
+                <td colspan="8" class="empty">
                     No repair records.
                 </td>
             </tr>
@@ -969,10 +970,20 @@ function searchVehicle() {
                     </td>
 
                     <td class="money">
-                        RM ${r.profit.toFixed(2)}
-                    </td>
+    RM ${r.profit.toFixed(2)}
+</td>
 
-                </tr>
+<td>
+    <button
+        class="primary"
+        onclick="downloadOldInvoice(${r.id})"
+        style="padding:8px 12px; white-space:nowrap;"
+    >
+        📄 PDF
+    </button>
+</td>
+
+</tr>
 
             `;
 
@@ -993,7 +1004,41 @@ function searchVehicle() {
     document.getElementById("vehicleResult").innerHTML = html;
 
 }
+async function downloadOldInvoice(repairId) {
 
+    const repair = repairs.find(
+        r => Number(r.id) === Number(repairId)
+    );
+
+    if (!repair) {
+        alert("Invoice record could not be found.");
+        return;
+    }
+
+    try {
+
+        const invoiceFile =
+            await generateInvoicePDF(repair);
+
+        alert(
+            "Invoice downloaded successfully!\n\n" +
+            "Invoice: " + repair.invoiceNo + "\n" +
+            "Plate: " + repair.plate
+        );
+
+    }
+    catch (error) {
+
+        console.error(
+            "Old invoice PDF error:",
+            error
+        );
+
+        alert(
+            "Unable to generate this invoice PDF."
+        );
+    }
+}
 
 /* =========================================
    DASHBOARD
