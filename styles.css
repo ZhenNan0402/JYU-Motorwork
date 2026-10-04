@@ -1,13 +1,4 @@
-{
-  "$schema": "../gen/schemas/desktop-schema.json",
-  "identifier": "default",
-  "description": "Default capability",
-  "windows": ["main"],
-  "permissions": [
-    "core:default",
-    "fs:allow-desktop-write"
-  ]
-}
+
 
 .logo.vanilla:hover {
   filter: drop-shadow(0 0 2em #ffe21c);
@@ -28,15 +19,80 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* =========================
+   MAIN CONTAINER
+   ========================= */
+
 .container {
-  margin: 0;
-  padding-top: 10vh;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  box-sizing: border-box;
+
   display: flex;
   flex-direction: column;
-  justify-content: center;
   text-align: center;
 }
 
+
+/* =========================
+   FORM LAYOUT - DESKTOP
+   ========================= */
+
+.form-row {
+  display: flex;
+  gap: 15px;
+}
+
+.form-row > * {
+  flex: 1;
+  min-width: 0;
+}
+
+
+/* =========================
+   REPAIR ROW - DESKTOP
+   ========================= */
+
+.repair-header,
+.repair-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 100px 45px;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.repair-header {
+  font-weight: bold;
+}
+
+.repair-description,
+.repair-quantity {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px;
+}
+
+.repair-quantity {
+  text-align: center;
+}
+
+
+/* =========================
+   TABLE
+   ========================= */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  min-width: 700px;
+}
 .logo {
   height: 6em;
   padding: 1.5em;
@@ -47,6 +103,91 @@
 .logo.tauri:hover {
   filter: drop-shadow(0 0 2em #24c8db);
 }
+
+/* =========================
+   MOBILE / PHONE
+   ========================= */
+
+@media (max-width: 768px) {
+
+  body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    line-height: 1.2;
+    margin: 15px 0;
+  }
+
+  /* Forms become one column */
+  .form-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+
+  /* Bigger phone-friendly inputs */
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  /* Bigger buttons */
+  button {
+    min-height: 46px;
+    padding: 10px 15px;
+  }
+
+  /* Repair entry becomes easier to use */
+  .repair-row {
+    grid-template-columns: 35px 1fr 70px 40px;
+    gap: 6px;
+  }
+
+  .repair-header {
+    grid-template-columns: 35px 1fr 70px 40px;
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  /* Allow tables to scroll instead of breaking page */
+  .table-wrapper {
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  table {
+    min-width: 650px;
+  }
+
+  .logo {
+    height: 4em;
+    padding: 0.5em;
+  }
+}
+
+
 
 .row {
   display: flex;
@@ -122,29 +263,7 @@ button {
   }
   
 }
-.repair-header,
-.repair-row {
-    display: grid;
-    grid-template-columns: 50px 1fr 100px 45px;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 8px;
-}
 
-.repair-header {
-    font-weight: bold;
-}
-
-.repair-description,
-.repair-quantity {
-    width: 100%;
-    box-sizing: border-box;
-    padding: 8px;
-}
-
-.repair-quantity {
-    text-align: center;
-}
 
 .remove-repair-row {
     cursor: pointer;
@@ -153,3 +272,4 @@ button {
 #addRepairRow {
     margin-top: 10px;
 }
+
